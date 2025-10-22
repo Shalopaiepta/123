@@ -146,6 +146,12 @@ namespace Affine3DWireframe
                 }
             }
 
+            // Draw coordinate axes (coordinate beacon like Minecraft)
+            DrawCoordinateAxes(g, cx, cy, focal);
+
+            // Display coordinates in top right corner
+            DrawCoordinateDisplay(g);
+
             string hint =
                 "Объёмная проволочная буква «К»:\n" +
                 "Мышь: ЛКМ — вращать, Shift+ЛКМ — переносить, колесо — масштаб\n" +
@@ -181,7 +187,7 @@ namespace Affine3DWireframe
 
             if (_translating)
             {
-                double scale = 2.0 / Math.Max(1, Math.Min(ClientSize.Width, ClientSize.Height));
+                double scale = 8.0 / Math.Max(1, Math.Min(ClientSize.Width, ClientSize.Height));
                 _position.X += dx * scale;
                 _position.Y -= dy * scale;
             }
@@ -256,6 +262,151 @@ namespace Affine3DWireframe
             _animScale = Vector3.One;
             _jumpActive = false;
             _returnElapsed = 0.0;
+        }
+
+        private void DrawCoordinateAxes(Graphics g, float cx, float cy, double focal)
+        {
+            // Create coordinate axes at origin
+            Vector3[] axesPoints = new Vector3[]
+            {
+                // Origin
+                Vector3.Zero,
+                // X axis (red)
+                new Vector3(1.5, 0, 0),
+                // Y axis (green) 
+                new Vector3(0, 1.5, 0),
+                // Z axis (blue)
+                new Vector3(0, 0, 1.5)
+            };
+
+            // Apply current transformation to axes
+            Vector3 totalScale = new Vector3(
+                _userScale.X * _animScale.X,
+                _userScale.Y * _animScale.Y,
+                _userScale.Z * _animScale.Z);
+
+            Matrix4 M = Matrix4.Identity();
+            M = Matrix4.Multiply(Matrix4.Scale(totalScale.X, totalScale.Y, totalScale.Z), M);
+            M = Matrix4.Multiply(Matrix4.RotationX(_rotation.X), M);
+            M = Matrix4.Multiply(Matrix4.RotationY(_rotation.Y), M);
+            M = Matrix4.Multiply(Matrix4.RotationZ(_rotation.Z), M);
+            M = Matrix4.Multiply(Matrix4.Translation(_position.X, _position.Y, _position.Z), M);
+
+            // Transform axes points
+            PointF[] projAxes = new PointF[4];
+            bool[] okAxes = new bool[4];
+
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3 v = M.TransformPoint(axesPoints[i]);
+                double zc = v.Z + CameraDistance;
+                if (zc <= 0.1)
+                {
+                    okAxes[i] = false;
+                    continue;
+                }
+                double sx = cx + (v.X * focal / zc);
+                double sy = cy - (v.Y * focal / zc);
+                projAxes[i] = new PointF((float)sx, (float)sy);
+                okAxes[i] = true;
+            }
+
+            if (okAxes[0])
+            {
+                // Draw X axis (red)
+                if (okAxes[1])
+                {
+                    using (var pen = new Pen(Color.Red, 3.0f))
+                    {
+                        g.DrawLine(pen, projAxes[0], projAxes[1]);
+                        // Draw arrowhead for X
+                        DrawArrowhead(g, pen, projAxes[0], projAxes[1]);
+                    }
+                }
+
+                // Draw Y axis (green)
+                if (okAxes[2])
+                {
+                    using (var pen = new Pen(Color.Green, 3.0f))
+                    {
+                        g.DrawLine(pen, projAxes[0], projAxes[2]);
+                        // Draw arrowhead for Y
+                        DrawArrowhead(g, pen, projAxes[0], projAxes[2]);
+                    }
+                }
+
+                // Draw Z axis (blue)
+                if (okAxes[3])
+                {
+                    using (var pen = new Pen(Color.Blue, 3.0f))
+                    {
+                        g.DrawLine(pen, projAxes[0], projAxes[3]);
+                        // Draw arrowhead for Z
+                        DrawArrowhead(g, pen, projAxes[0], projAxes[3]);
+                    }
+                }
+            }
+        }
+
+        private void DrawArrowhead(Graphics g, Pen pen, PointF start, PointF end)
+        {
+            double dx = end.X - start.X;
+            double dy = end.Y - start.Y;
+            double len = Math.Sqrt(dx * dx + dy * dy);
+            if (len < 1e-6) return;
+
+            double arrowLength = 10;
+            double arrowAngle = Math.PI / 6; // 30 degrees
+
+            dx /= len;
+            dy /= len;
+
+            double x1 = end.X - arrowLength * (dx * Math.Cos(arrowAngle) - dy * Math.Sin(arrowAngle));
+            double y1 = end.Y - arrowLength * (dy * Math.Cos(arrowAngle) + dx * Math.Sin(arrowAngle));
+
+            double x2 = end.X - arrowLength * (dx * Math.Cos(-arrowAngle) - dy * Math.Sin(-arrowAngle));
+            double y2 = end.Y - arrowLength * (dy * Math.Cos(-arrowAngle) + dx * Math.Sin(-arrowAngle));
+
+            g.DrawLine(pen, end, new PointF((float)x1, (float)y1));
+            g.DrawLine(pen, end, new PointF((float)x2, (float)y2));
+        }
+
+        private void DrawCoordinateDisplay(Graphics g)
+        {
+            // Calculate display coordinates based on current transformation state
+            Vector3 totalScale = new Vector3(
+                _userScale.X * _animScale.X,
+                _userScale.Y * _animScale.Y,
+                _userScale.Z * _animScale.Z);
+
+            // Convert rotation from radians to degrees for display
+            double rotX = _rotation.X * 180.0 / Math.PI;
+            double rotY = _rotation.Y * 180.0 / Math.PI;
+            double rotZ = _rotation.Z * 180.0 / Math.PI;
+
+            string coordText = String.Format(
+                "global position: x{0:+0.00;-0.00;+0.00} y{1:+0.00;-0.00;+0.00} z{2:+0.00;-0.00;+0.00}\n" +
+                "local rotation: x{3:+0.0;-0.0;+0.0} y{4:+0.0;-0.0;+0.0} z{5:+0.0;-0.0;+0.0}\n" +
+                "scale: x{6:+0.000;-0.000;+0.000} y{7:+0.000;-0.000;+0.000} z{8:+0.000;-0.000;+0.000}",
+                _position.X, _position.Y, _position.Z,
+                rotX, rotY, rotZ,
+                totalScale.X, totalScale.Y, totalScale.Z);
+
+            using (var brush = new SolidBrush(Color.White))
+            using (var font = new Font("Consolas", 9f, FontStyle.Regular))
+            {
+                SizeF textSize = g.MeasureString(coordText, font);
+                float x = ClientSize.Width - textSize.Width - 10;
+                float y = 10;
+
+                // Draw background
+                using (var bgBrush = new SolidBrush(Color.FromArgb(180, Color.Black)))
+                {
+                    g.FillRectangle(bgBrush, x - 5, y - 2, textSize.Width + 10, textSize.Height + 4);
+                }
+
+                g.DrawString(coordText, font, brush, x, y);
+            }
         }
     }
 }
