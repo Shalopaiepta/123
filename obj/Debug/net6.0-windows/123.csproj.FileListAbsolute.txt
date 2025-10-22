@@ -1,0 +1,17 @@
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.csproj.AssemblyReference.cache
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\Affine3DWireframe.MainForm.resources
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.csproj.GenerateResource.cache
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.AssemblyInfoInputs.cache
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.AssemblyInfo.cs
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\source\repos\123\bin\Debug\net6.0-windows\123.exe
+C:\Users\Lenovo\source\repos\123\bin\Debug\net6.0-windows\123.deps.json
+C:\Users\Lenovo\source\repos\123\bin\Debug\net6.0-windows\123.runtimeconfig.json
+C:\Users\Lenovo\source\repos\123\bin\Debug\net6.0-windows\123.dll
+C:\Users\Lenovo\source\repos\123\bin\Debug\net6.0-windows\123.pdb
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.dll
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\refint\123.dll
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.pdb
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\123.genruntimeconfig.cache
+C:\Users\Lenovo\source\repos\123\obj\Debug\net6.0-windows\ref\123.dll
