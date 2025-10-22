@@ -154,9 +154,9 @@ namespace Affine3DWireframe
 
             string hint =
                 "Объёмная проволочная буква «К»:\n" +
-                "Мышь: ЛКМ — вращать, Shift+ЛКМ — переносить, колесо — масштаб\n" +
-                "Клавиатура: WSAD/стрелки — перенос, Q/E — поворот Z, +/- — масштаб\n" +
-                "TAB — пульсация масштаба, R — сброс";
+                "Мышь: ЛКМ — вращать, Shift+ЛКМ — переносить XY, колесо — масштаб\n" +
+                "Клавиатура: WSAD — перенос XY, PageUp/PageDown — перенос Z\n" +
+                "Q/E — поворот Z, +/- — масштаб, TAB — анимация, R — сброс";
             using (var br = new SolidBrush(Color.FromArgb(220, Color.Black)))
             using (var font = new Font("Segoe UI", 9f))
             {
@@ -215,6 +215,8 @@ namespace Affine3DWireframe
             if (e.KeyCode == Keys.Right || e.KeyCode == Keys.D) _position.X += move;
             if (e.KeyCode == Keys.Up || e.KeyCode == Keys.W) _position.Y += move;
             if (e.KeyCode == Keys.Down || e.KeyCode == Keys.S) _position.Y -= move;
+            if (e.KeyCode == Keys.PageUp) _position.Z += move;         // Z вперед (ближе к камере)
+            if (e.KeyCode == Keys.PageDown) _position.Z -= move;       // Z назад (дальше от камеры)
             if (e.KeyCode == Keys.Q) _rotation.Z -= rot;
             if (e.KeyCode == Keys.E) _rotation.Z += rot;
 
